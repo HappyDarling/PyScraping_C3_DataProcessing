@@ -19,16 +19,20 @@ if not os.path.exists(savename):
 xml = open(savename, 'r', encoding="utf-8").read()
 soup = BeautifulSoup(xml, 'html.parser')
 
-todayxml = soup.find('tm').string
-today = datetime.datetime.strptime(todayxml, "%Y%m%d%H%M")
+announcexml = soup.find('tm').string
+announce = datetime.datetime.strptime(announcexml, "%Y%m%d%H%M")
 data = {} # data / [day, hour, temp, wfKor] 날짜 시간 일기예보
 for dt in soup.find_all("data"):
     data[int(dt['seq'])] = []
-    data[int(dt['seq'])].append(dt.find("day").string)
-    data[int(dt['seq'])].append(dt.find("hour").string)
+    if dt.find("hour").string != '24':
+        data[int(dt['seq'])].append(dt.find("day").string)
+        data[int(dt['seq'])].append(dt.find("hour").string)
+    else:
+        data[int(dt['seq'])].append(str(int(dt.find("day").string)+1))
+        data[int(dt['seq'])].append('0') # datetime에 24시라는 시간이 들어가면 오류가 나기 때문에 예외처리
     data[int(dt['seq'])].append(dt.find("temp").string)
     data[int(dt['seq'])].append(dt.find("wfkor").string)
-    #print(data[dt['seq']])
+    #print(data[int(dt['seq'])])
 
 # 일자
 # 시 기온 기상정보
@@ -38,6 +42,9 @@ with open('D:\Django\\workspace\\WebCrawling\\C3_DataProcessing\\forecast_Yatab.
     for dk in sorted(data.keys()):
         if data[dk][0] != tday:
             tday = data[dk][0]
-            today = today + relativedelta(days=1)
+            today = announce + relativedelta(days=int(tday))
             print(today.strftime('%Y-%m-%d'))
-        print(today.strftime('%H:%M'))
+            f.write(today.strftime('%Y-%m-%d')+'\n')
+        time = datetime.datetime.strptime(data[dk][1], "%H")
+        print(time.strftime('%H:%M'), data[dk][2], "°C", data[dk][3])
+        f.write(time.strftime('%H:%M') + " " + data[dk][2] + "°C " + data[dk][3] + '\n')
