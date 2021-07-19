@@ -20,4 +20,6 @@ Pandas (pip install pandas)
 데이터 분석, 데이터 처리를 쉽게 하기 위해 만든 파이썬 패키지
 대용량 데이터를 정렬하고 구조화 시켜서 통계, 차트 데이터를 만들어 활용할수 있음
 
-CSV 데이터
+엑셀데이터를 파이썬에서 읽고 쓰기 위해서는 두가지 패키지가 필요하다
+pip install xlrd : 읽기
+pip install openpyxl : 쓰기
